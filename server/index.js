@@ -18,6 +18,8 @@ import routeRoutes  from './routes/route.routes.js';
 
 dotenv.config();
 connectDB();
+// Health check endpoint — Render uses this to verify app is running
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 const app        = express();
 const httpServer = createServer(app);
