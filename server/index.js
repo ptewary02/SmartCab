@@ -18,8 +18,6 @@ import routeRoutes  from './routes/route.routes.js';
 
 dotenv.config();
 connectDB();
-// Health check
-app.get('/health', (req, res) => res.json({ status: 'ok', message: 'SmartCab backend is live' }));
 
 const app        = express();
 const httpServer = createServer(app);
@@ -33,6 +31,9 @@ app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Health check
+app.get('/health', (req, res) => res.json({ status: 'ok', message: 'SmartCab backend is live' }));
 
 app.use('/api/auth',    authRoutes);
 app.use('/api/drivers', driverRoutes);
