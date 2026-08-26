@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useAuthStore from '../store/authStore';
 
-const Field = ({ icon, placeholder, type = "text", value, onChange, disabled }) => (
+const Field = ({ icon, placeholder, type = "text", value, onChange, disabled, isPassword, showPassword, onToggleShow }) => (
   <div style={{ position: "relative" }}>
     <span className="material-symbols-outlined" style={{ position: "absolute", left: 0, bottom: 8 }}>
       {icon}
@@ -11,12 +11,33 @@ const Field = ({ icon, placeholder, type = "text", value, onChange, disabled }) 
     <input
       className="underlined-input"
       placeholder={placeholder}
-      type={type}
+      type={isPassword ? (showPassword ? "text" : "password") : type}
       value={value}
       onChange={onChange}
       disabled={disabled}
+      style={isPassword ? { paddingRight: 28 } : undefined}
       required
     />
+    {isPassword && (
+      <span
+        className="material-symbols-outlined"
+        onClick={onToggleShow}
+        role="button"
+        tabIndex={0}
+        aria-label={showPassword ? "Hide password" : "Show password"}
+        style={{
+          position: "absolute",
+          right: 0,
+          bottom: 6,
+          fontSize: 20,
+          color: "#45474d",
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        {showPassword ? "visibility_off" : "visibility"}
+      </span>
+    )}
   </div>
 );
 
@@ -25,6 +46,7 @@ export default function Login() {
   const { login } = useAuthStore();
   const [form, setForm]       = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handle = async (e) => {
     e.preventDefault();
@@ -58,10 +80,13 @@ export default function Login() {
             disabled={loading}
           />
           <Field
-            icon="lock" placeholder="Password" type="password"
+            icon="lock" placeholder="Password"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             disabled={loading}
+            isPassword
+            showPassword={showPassword}
+            onToggleShow={() => setShowPassword((s) => !s)}
           />
         </div>
 

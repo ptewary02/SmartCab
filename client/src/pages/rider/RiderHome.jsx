@@ -31,14 +31,16 @@ export default function RiderHome() {
 
   const onMapLoad = useCallback((m) => { setMap(m); setMapLoaded(true); }, []);
 
-  const onMapClick = async (e) => {
-    const lat  = e.latLng.lat();
-    const lng  = e.latLng.lng();
-    const addr = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-    setDest({ lat, lng });
-    setDestAddr(addr);
-    await fetchRoute({ lat, lng });
-  };
+  const onMapClick = useCallback((e) => {
+  const lat = e.latLng?.lat();
+  const lng  = e.latLng?.lng();
+  if (!lat || !lng) return;
+
+  const dest = { lat, lng, address: `${lat.toFixed(5)}, ${lng.toFixed(5)}` };
+  setDest(dest);
+  setDestAddr(dest.address);
+  fetchRoute(dest);
+}, [pickup]);
 
   const getMyLocation = () => {
     if (!navigator.geolocation) return toast.error('Geolocation not supported');
@@ -96,7 +98,9 @@ export default function RiderHome() {
       <nav style={s.nav}>
         <div style={s.navLeft}>
           <div style={s.brand}>
-            <span style={s.brandIcon}>🚖</span>
+            <span style={s.brandIcon}>
+              <img src='./assets/Premium_Yellow_Cab-removebg-preview.png' style={{width: '30px', height: '30px'}}></img>
+              </span>
             <span style={s.brandName}>SmartCab</span>
           </div>
           <div style={s.navLinks}>
@@ -170,6 +174,36 @@ export default function RiderHome() {
                   value={destAddr}
                   readOnly
                 />
+              </div>
+            </div>
+
+            <div style={{ marginTop: 8, marginBottom: 8}}>
+              <p style={{ fontSize: 12, color: '#7a8fa6', margin: '0 0 6px' }}>
+                Or enter destination coordinates manually:
+              </p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  placeholder="Lat e.g. 26.748"
+                  style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid #2a3a50', background: '#0D1B2A', color: '#fff', fontSize: 13, outline: 'none' }}
+                  onChange={(e) => {
+                    const lat = parseFloat(e.target.value);
+                    if (!isNaN(lat) && destination) setDest({ ...destination, lat });
+                  }}
+                />
+                <input
+                  placeholder="Lng e.g. 83.390"
+                  style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid #2a3a50', background: '#0D1B2A', color: '#fff', fontSize: 13, outline: 'none' }}
+                  onChange={(e) => {
+                    const lng = parseFloat(e.target.value);
+                    if (!isNaN(lng) && destination) setDest({ ...destination, lng });
+                  }}
+                />
+                <button
+                  onClick={() => { if (destination) fetchRoute(destination); }}
+                  style={{ padding: '8px 12px', borderRadius: 8, border: 'none', background: '#F28C28', color: '#0D1B2A', fontWeight: 700, cursor: 'pointer', fontSize: 13 }}
+                >
+                  Go
+                </button>
               </div>
             </div>
 
